@@ -50,8 +50,8 @@ When wiring your screen, you can either wire it directly to one of your Raspberr
     | GPIO 15 (RXD) | TX (Yellow wire)  |
 
     <p float="left">
-        <img src="img/rpi_conn.png" height="400">
-        <img src="img/TFT_conn.jpeg" height="400">
+        <img src="img/rpi_conn.jpg" height="400">
+        <img src="img/TFT_conn.jpg" height="400">
     </p>
 
 ### USB to UART Converter
@@ -64,8 +64,8 @@ Quite simple, just remember to cross RX and TX on the TFT and the USB/UART HW.
 | RXD             | TX (Yellow wire)  |
 
 <p float="left">
-    <img src="img/USB_conn.png" height="400">
-    <img src="img/TFT_conn.jpeg" height="400">
+    <img src="img/USB_conn.jpg" height="400">
+    <img src="img/TFT_conn.jpg" height="400">
 </p>
 
 ## Enable the UART
@@ -154,8 +154,8 @@ Enable the service to automatically start at boot:
 
 ## Example pictures
 <p float="left">
-    <img src="img/printing_page.jpeg" width="600">
-    <img src="img/file_explorer.jpeg" width="600">
+    <img src="img/printing_page.jpg" width="600">
+    <img src="img/file_explorer.jpg" width="600">
 </p>
 
 ## Development
