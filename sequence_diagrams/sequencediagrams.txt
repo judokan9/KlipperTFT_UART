@@ -1,0 +1,224 @@
+A0: Get the current hot end temperature
+title Get the current hot end temperature
+
+LCD->Printer: Request current hot end temperature
+note over LCD,Printer: A0
+LCD<-Printer: Return current hot end temperature
+note over LCD,Printer: A1V 25
+
+A1: Get the target hot end temperature
+title Get the target hot end temperature
+
+LCD->Printer: Request target hot end temperature
+note over LCD,Printer: A1
+Printer->LCD: Return target hot end temperature
+note over LCD,Printer: A1V 100
+
+A2: Get the current heat bed temperature
+title Get the current heat bed temperature
+
+LCD->Printer: Request current heat bed temperature
+note over LCD,Printer: A2
+Printer->LCD: Return current heat bed temperature
+note over LCD,Printer: A2V 25
+
+A3: Get the target heat bed temperature
+title Get the target heat bed temperature
+
+LCD->Printer: Request target heat bed temperature
+note over LCD,Printer: A3
+Printer->LCD: Return target heat bed temperature
+note over LCD,Printer: A3V 75
+
+A4: Get the part cooling fan speed
+title Get the part cooling fan speed
+
+LCD->Printer: Request part fan speed
+note over LCD,Printer: A4
+Printer->LCD: Return fan speed percentage
+note over LCD,Printer: A4V 50
+
+A5: Get the current position
+title Get the current position
+
+LCD->Printer: Request current position:
+note over LCD,Printer:A5
+Printer->LCD: Return X, Y, Z positions:
+note over LCD,Printer: A5V A5V X: -5.0 Y: -5.0 Z: 10.0
+
+A6: Get the print progress
+title Get the print progress
+
+LCD->Printer: Request print progress:
+note over LCD,Printer:A6
+Printer->LCD: Return progress percentage:
+note over LCD,Printer:A6V 0.0
+
+A7: Get the printing time
+title Get the printing time
+
+LCD->Printer: Request printing time:
+note over LCD,Printer:A7
+Printer->LCD:
+note over LCD,Printer: Return printing time: A7V 999 H 999 M
+
+A8: Get the list of G-code files
+title Get the list of G-code files
+
+LCD->Printer: Request page of files:
+note over LCD,Printer:A8 S0 or A8 S4, A8 S8, etc.
+LCD<-Printer: Send list of files:
+note over LCD,Printer:FN\n<menu>\n<Special Menu>\n<1-d.idx>\nfirstfile.gcode\n<7-f.idx>\nCable_Zip_Tie_Mount.gcode\n<3-d.idx>\nlastfile.gcode\nEND
+
+title Pause the current print
+
+LCD->Printer: Pause the current print
+note over LCD,Printer:A9
+LCD<-Printer: ACK Print is paused
+note over LCD,Printer:J05
+
+A10: Resume the paused print
+title Resume the paused print
+
+LCD->Printer: Resume print
+note over LCD,Printer:A10
+LCD<-Printer: ACK print is running
+note over LCD,Printer:J04
+
+A11: Stop the current print
+title Stop the current print
+
+LCD->Printer: Stop print
+note over LCD,Printer:A11
+LCD<-Printer: ACK print is stopped
+note over LCD,Printer:J16
+LCD<-Printer: Set print as completed
+note over LCD,Printer:J14
+
+A12: Kill the current print
+title Kill the current print
+
+
+LCD->Printer: Kill print
+note over LCD,Printer:A12
+LCD<-Printer: ACK print is stopped
+note over LCD,Printer:J16
+LCD<-Printer: Set print as completed
+note over LCD,Printer:J14
+
+title Select a file for printing
+
+LCD->Printer: send altname i.e. <1-d.idx>
+note over LCD,Printer: A13 <1-d.idx>
+Printer->LCD: Update current view if directory or ACK select file
+note over LCD,Printer:FN\n<8-f.idx>\nmyfile.gcode\n<9-f.idx>\nmysecondfile.gcode\n<back-d.idx>\n/..
+LCD<-Printer: ACK if a was file selected
+note over LCD,Printer: J20
+
+A14: Start printing the selected file
+title Start printing the selected file
+
+LCD->Printer: Send start print
+note over LCD,Printer:A14
+note over Printer: Use the latest selected\nfile stored in variable\non controller\nto start print
+LCD<-Printer: ACK print start
+note over LCD,Printer:J04
+
+A15: Resume printing from power outage
+title Resume printing from power outage
+
+LCD->Printer: Resume print
+note over LCD,Printer:A15
+
+
+A16: Set the target hot end temperature
+title Set the target hot end temperature
+
+LCD->Printer: Set target hot end temperature
+note over LCD,Printer: A16 S240
+note over Printer: Set new hot end\ntarget temperature
+
+A17: Set the target heat bed temperature
+title Set the target heat bed temperature
+
+LCD->Printer: Set target heat bed temperature
+note over LCD,Printer: A17 S75
+note over Printer: Set new heat bed\ntarget temperature
+
+A18: Set the part cooling fan speed
+title Set the part cooling fan speed
+
+LCD->Printer: Set fan speed percentage
+note over LCD,Printer: A18 S65
+note over Printer: Set fan speed
+
+A19: Stop the stepper motors
+title Stop the stepper motors
+
+LCD->Printer: Send MOTOR_OFF event
+note over LCD,Printer: A19
+
+A20: Get or set the printing speed
+title Get or set the printing speed
+
+
+LCD->Printer: Request current printing speed
+note over LCD,Printer: A20
+
+LCD<-Printer: Update printing speed
+note over LCD,Printer: A20 V100.0
+
+A21: Home axes
+title Home axes
+
+alt Home all:
+    LCD->Printer: HOME 'all'
+    note over LCD,Printer: A21 C
+else Home X:
+    LCD->Printer: HOME 'X'
+    note over LCD,Printer: A21 X
+else Home Y:
+    LCD->Printer: HOME 'Y'
+    note over LCD,Printer: A21 Y
+else Home Z:
+    LCD->Printer: HOME 'Z'
+    note over LCD,Printer: A21 Z
+
+A22: Move a specific axis
+title Move a specific axis
+
+LCD->Printer: Send MOVE event with axis, distance, and speed
+note over LCD,Printer: A22 X +10F3000
+
+A23: Preheat for PLA
+title Preheat for PLA
+
+LCD->Printer: Preheat PLA
+note over LCD,Printer: A23
+
+A24: Preheat for ABS
+title Preheat for ABS
+
+LCD->Printer: Preheat ABS
+note over LCD,Printer: A24
+
+A25: Cool down the printer
+title Cool down the printer
+
+LCD->Printer: Cooling
+note over LCD,Printer: A25
+LCD<-Printer: ACK Cooling
+note over LCD,Printer: J12 (Cooling down)
+
+A26: Refresh the list of G-code files
+title Refresh the list of G-code files
+
+LCD->Printer: Get current directory and file dictionary
+note over LCD,Printer: A26
+
+alt File dictionary exists:
+    note over Printer: Render view of file\ndictionary and current directory
+else File dictionary empty:
+    LCD<-Printer: Send view of file dictionary and current directory
+    note over LCD,Printer:FN\n<8-f.idx>\nmyfile.gcode\n<9-f.idx>\nmysecondfile.gcode\n<back-d.idx>\n/..
+LCD<-Printer: Send J21 (Unset file load successful)

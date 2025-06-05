@@ -264,7 +264,7 @@ class PrinterData:
 		self.max_accel              = None
 		self.minimum_cruise_ratio   = None
 		self.square_corner_velocity = None
-		
+
 		self.op = MoonrakerSocket(URL, 80, API_Key)
 		print(self.op.base_address)
 
@@ -275,15 +275,15 @@ class PrinterData:
 			time.sleep(1)
 
 		klippy_sock_found = False
-		if 'result' in info:
-			if 'config' in info['result']:
-				if 'server' in info['result']['config']:
-					if 'klippy_uds_address' in info['result']['config']['server']:
-						self.klippy_sock = os.path.expanduser(info['result']['config']['server']['klippy_uds_address'])
-						klippy_sock_found = True
+		#if 'result' in info:
+		#	if 'config' in info['result']:
+		#		if 'server' in info['result']['config']:
+		#			if 'klippy_uds_address' in info['result']['config']['server']:
+		#				self.klippy_sock = os.path.expanduser(info['result']['config']['server']['klippy_uds_address'])
+		#				klippy_sock_found = True
 
 		if not klippy_sock_found:
-			self.klippy_sock = os.path.expanduser("~/printer_data/comms/klippy.sock")
+			self.klippy_sock = os.path.expanduser("/tmp/local_klippy.sock")
 
 
 		self.klippy_start()
@@ -351,7 +351,7 @@ class PrinterData:
 					if self.current_position.e != status['toolhead']['position'][3]:
 						self.current_position.e = status['toolhead']['position'][3]
 						self.current_position.updated = True
-					
+
 				if 'homed_axes' in status['toolhead']:
 					if 'x' in status['toolhead']['homed_axes']:
 						self.current_position.home_x = True
@@ -365,7 +365,7 @@ class PrinterData:
 						self.current_position.home_z = True
 					else:
 						self.current_position.home_z = False
-				
+
 				if 'max_velocity' in status['toolhead']:
 					if self.max_velocity != status['toolhead']['max_velocity']:
 						self.max_velocity = status['toolhead']['max_velocity']
@@ -394,7 +394,7 @@ class PrinterData:
 			objects = self.getREST('/printer/objects/list')['result']['objects']
 		except:
 			print("Could not read printer features objects!")
-		
+
 		for obj in objects:
 			if 'led' in obj:
 				led = obj.split(' ')[1]
@@ -488,16 +488,16 @@ class PrinterData:
 			gcode_store = self.getREST('/server/gcode_store?count=%d' % count)['result']['gcode_store']
 		except:
 			print("GCode store read failed!")
-		
+
 		return gcode_store
-	
+
 	def get_macros(self, filter_internal = True):
 		macros = []
 		try:
 			objects = self.getREST('/printer/objects/list')['result']['objects']
 		except:
 			print("Could not read macro objects!")
-		
+
 		for obj in objects:
 			if 'gcode_macro' in obj:
 				macro = obj.split(' ')[1]
@@ -506,7 +506,7 @@ class PrinterData:
 						macros.append(macro)
 				else:
 					macros.append(macro)
-		return macros	
+		return macros
 
 	def GetFiles(self, refresh=False):
 		if not self.files or refresh:
@@ -549,7 +549,7 @@ class PrinterData:
 		self.bed = data['heater_bed'] #temperature, target
 		self.extruder = data['extruder'] #temperature, target
 		self.fan = data['fan']
-		if 'led %s' % self.LED[0] in data:
+		if self.LED and 'led %s' % self.LED[0] in data:
 			self.led_percentage = int(data['led %s' % self.LED[0]]['color_data'][0][3] * 256)
 		self.toolhead = data['toolhead']
 		Update = False
@@ -573,7 +573,7 @@ class PrinterData:
 				self.BABY_Z_VAR = self.z_offset
 				self.HMI_ValueStruct.offset_value = self.z_offset * 100
 				Update = True
-			
+
 			if self.max_velocity != self.toolhead['max_velocity']:
 				self.max_velocity = self.toolhead['max_velocity']
 				Update = True
@@ -593,7 +593,7 @@ class PrinterData:
 		except:
 			print("Exception 470")
 			return False
-		
+
 		if data['display_status']:
 			if self.print_percent is not None:
 				if int(self.print_percent*100) is not int(data['display_status']['progress']*100):
@@ -634,7 +634,7 @@ class PrinterData:
 			if self.job_Info['virtual_sdcard']['is_active']:
 				return self.job_Info['print_stats']['print_duration']
 		return 0
-	
+
 	def timeSinceUpdate(self):
 		if self.last_percent_update is not None:
 			return time.time() - self.last_percent_update

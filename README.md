@@ -1,30 +1,48 @@
-# KlipperLCD (for Elegoo Neptune 3 Pro LCD screen)
-Want to run Klipper on your Neptune 3 Pro? And still want to be able to use your Neptune 3 Pro LCD touch screen?
+# KlipperTFT (for Anycubic-i3-Mega TFT screens)
+Want to run Klipper on your Anycubic-i3-Mega? And still want to be able to use your Anycubic-i3-Mega TFT touch screen?
 
-Take a look at this python service for the Elegoo Neptune 3 Pro LCD! Running together with Klipper3d and Moonraker!
+Take a look at this python service.
 
-## Look and feel
-<p float="left">
-    <img src="img/boot_screen.PNG" height="400">
-    <img src="img/main_screen.PNG" height="400">
-    <img src="img/about_screen.PNG" height="400">
-</p>
+Forked from [joakimtoe/KlipperTFT](https://github.com/joakimtoe/KlipperTFT) and based on the work of Marlin [`anycubic_i3mega_TFT.cpp`](https://github.com/MarlinFirmware/Marlin/blob/eaab2dea925f0da5b38fcec1c58e9b8806efbaf8/Marlin/src/lcd/extui/anycubic_i3mega/anycubic_i3mega_lcd.cpp)
+
+Thank you for your Work!!!
+
+Running together with Klipper3d and Moonraker!
+
+> [!WARNING]
+> I haven't yet had a chance to test the display and all the functions down to the last detail. **However, most of them should work.**
+> Nevertheless, some functions cannot be implemented due to the functional scope of the display and the communication protocol. **This is a work in progress. There is no guarantee. Be careful, watch your printer, double check things. Use it as is. I am not responsible for any damages or consequences of any kind.**
+
+## ToDo
+* [ ] Get every currently function completely tested and verified
+* [ ] Verify Mega X Display wiring / compatibility
+* [ ] Reset print status page on Emergency stop
+* [ ] Resume print after power-outage
+* [ ] Support for the anycubic_chiron?
+* [ ] Figure the missing J-Commands out
+* [ ] Ensure that the controller responds appropriately to requests from the display with J commands
+* [ ] Possibly, improve the file/directory traversing in the file explorer? -> Needs a press on the UP-Arrow or Refresh button after changing directories
+* [ ] Improve Error Handling of the code and in case of edge cases
+* [ ] Use types for vars?
+* [ ] Use ENV vars to configure UART-Port and moonraker address and configure the service via systemd-service / `/etc/defaults`
+* [ ] Maybe a context manager for the uart port
+* [ ] Use the special menu for Stuff like bed leveling
 
 ## Whats needed?
-* A Elegoo Neptune 3 Pro with LCD screen.
+* A Anycubic-i3-Mega TFT Screen (any from [THIS](https://github.com/knutwurst/Marlin-2-0-x-Anycubic-i3-MEGA-S/wiki/Types-of-Anycubic-Touchscreens) list should work).
 * A Raspberry Pi or similar SBC to run Klipper. I suggest using the [Klipper Installation And Update Helper (KIAUH)](https://github.com/dw-0/kiauh) to setup and install Klipper, Moonraker and the web user interface of choice ([Fluidd](https://docs.fluidd.xyz/)/[Mainsail](https://docs.mainsail.xyz/)).
-* Some re-wiring of the LCD screen to connect it to one of the UARTs availible on your Raspberry Pi / SBC or through a USB to UART converter.
-* Then you can follow this guide to enable your Neptune 3 Pro touch screen!
+* Some re-wiring of the TFT screen to connect it to one of the UARTs availible on your Raspberry Pi / SBC or through a USB to UART converter.
+* Then you can follow this guide to enable your Anycubic-i3-Mega touch screen again!
 
-## Wire the LCD
+## Wire the TFT
 When wiring your screen, you can either wire it directly to one of your Raspberry Pi / SBC availible UARTs or you can wire it through a USB to UART converter. Both options are described below, pick the option that suits your needs.
 
 ### To a Raspberry Pi UART
-1. Remove the back-cover of the LCD by unscrewing the four screws.
+1. Remove the back-cover of the TFT by unscrewing the four screws.
 
-2. Connect the LCD to the Raspberry Pi UART according to the table below:
+2. Connect the TFT to the Raspberry Pi UART according to the table below:
 
-    | Raspberry Pi  | LCD               |
+    | Raspberry Pi  | TFT               |
     | ------------- | ----------------- |
     | Pin 4 (5V)    | 5V  (Black wire)  |
     | Pin 6 (GND)   | GND (Red wire)    |
@@ -33,12 +51,12 @@ When wiring your screen, you can either wire it directly to one of your Raspberr
 
     <p float="left">
         <img src="img/rpi_conn.png" height="400">
-        <img src="img/LCD_conn.png" height="400">
+        <img src="img/TFT_conn.jpeg" height="400">
     </p>
 
 ### USB to UART Converter
-Quite simple, just remember to cross RX and TX on the LCD and the USB/UART HW.
-| USB <-> UART HW | LCD               |
+Quite simple, just remember to cross RX and TX on the TFT and the USB/UART HW.
+| USB <-> UART HW | TFT               |
 | --------------- | ----------------- |
 | 5V              | 5V  (Black wire)  |
 | GND             | GND (Red wire)    |
@@ -47,17 +65,8 @@ Quite simple, just remember to cross RX and TX on the LCD and the USB/UART HW.
 
 <p float="left">
     <img src="img/USB_conn.png" height="400">
-    <img src="img/LCD_conn.png" height="400">
+    <img src="img/TFT_conn.png" height="400">
 </p>
-
-## Update the LCD screen firmware
-1. Copy the LCD screen firmware `LCD/20240125.tft` to the root of a FAT32 formatted micro-SD card.
-2. Make sure the LCD screen is powered off.
-3. Insert the micro-SD card into the LCD screens SD card holder. Back-cover needs to be removed.
-4. Power on the LCD screen and wait for screen to say `Update Successed!`
-
-A more detailed guide on LCD screen firmware update can be found on the [Elegoo web-pages](https://www.elegoo.com/blogs/3d-printing/elegoo-neptune-3-pro-plus-max-fdm-3d-printer-support-files).
-
 
 ## Enable the UART
 > **_Note_**: You can safely skip this section if you wired the display through a USB to UART converter
@@ -70,14 +79,14 @@ A more detailed guide on LCD screen firmware update can be found on the [Elegoo 
   * At the prompt Would you like a login shell to be accessible over serial? answer 'No'
   * At the prompt Would you like the serial port hardware to be enabled? answer 'Yes'
   * Exit raspi-config and reboot the Pi for changes to take effect.
-  
-  For full instructions on how to use Device Tree overlays see [this page](https://www.raspberrypi.org/documentation/configuration/device-tree.md). 
-  
+
+  For full instructions on how to use Device Tree overlays see [this page](https://www.raspberrypi.org/documentation/configuration/device-tree.md).
+
   In brief, add a line to the `/boot/config.txt` file to apply a Device Tree overlay.
-    
+
     dtoverlay=disable-bt
 
-## Run the KlipperLCD service
+## Run the KlipperTFT service
 * SSH into your Raspberry Pi
 
 ### Klipper socket API
@@ -90,7 +99,7 @@ A more detailed guide on LCD screen firmware update can be found on the [Elegoo 
     Response:
 
         KLIPPER_ARGS="/home/pi/klipper/klippy/klippy.py /home/pi/printer_data/config/printer.cfg -I /home/pi/printer_data/comms/klippy.serial -l /home/pi/printer_data/logs/klippy.log -a /home/pi/printer_data/comms/klippy.sock"
-    
+
     The KLIPPER_ARGS should include `-a /home/pi/printer_data/comms/klippy.sock`. If not add it to the klipper.env file!
 
 ### Install dependencies
@@ -98,67 +107,140 @@ A more detailed guide on LCD screen firmware update can be found on the [Elegoo 
     pip install pyserial
 
 ### Get the code
-    git clone https://github.com/joakimtoe/KlipperLCD
-    cd KlipperLCD
+    git clone https://github.com/judokan9/KlipperTFT_UART.git
+    cd KlipperTFT_UART
 
 ### Configure the code
-* Open `main.py` and find the `class KlipperLCD` declaration:
+* Open `main.py` and find the `class KlipperTFT` declaration:
 ```python
-class KlipperLCD ():
+class KlipperTFT ():
     def __init__(self):
         ...
-        LCD("/dev/ttyAMA0", callback=self.lcd_callback)
+        TFT("/dev/ttyAMA0", callback=self.lcd_callback)
         ...
 ```
-* If your UART is something other than the default `ttyAMA0`, replace the string `"/dev/ttyAMA0"` to match your UART selection. 
+* If your UART is something other than the default `ttyAMA0`, replace the string `"/dev/ttyAMA0"` to match your UART selection.
 
 
     > **_Note_**: If using a USB to UART converter to connect your screen to Klipper, the converter usually shows up in Linux as `"/dev/ttyUSB0"`.
 
 
 ### Run the code
-Once the LCD touch screen is wired to the Raspberry Pi, Klipper socket API is enabled and the KlipperLCD class is configured according to your wiring you can fire up the code!
+Once the TFT touch screen is wired to the Raspberry Pi, Klipper socket API is enabled and the KlipperTFT class is configured according to your wiring you can fire up the code!
 
     python3 main.py
 
 Congratulations! You can now use the touch screen!
 
-### Run KlipperLCD service at boot
-If the path of `main.py` is something else than `/home/pi/KlipperLCD/main.py` or your user is not `pi`. Open and edit `KlipperLCD.service` to fit your needs.
+### Run KlipperTFT service at boot
+If the path of `main.py` is something else than `/home/pi/KlipperTFT/main.py` or your user is not `pi`. Open and edit `KlipperTFT.service` to fit your needs.
 
 Enable the service to automatically start at boot:
 
     sudo chmod +x main.py
 
-    sudo chmod +x KlipperLCD.service
+    sudo chmod +x KlipperTFT.service
 
-    sudo mv KlipperLCD.service /etc/systemd/system/KlipperLCD.service
+    sudo mv KlipperTFT.service /etc/systemd/system/KlipperTFT.service
 
-    sudo chmod 644 /etc/systemd/system/KlipperLCD.service
+    sudo chmod 644 /etc/systemd/system/KlipperTFT.service
 
     sudo systemctl daemon-reload
 
-    sudo systemctl enable KlipperLCD.service
+    sudo systemctl enable KlipperTFT.service
 
     sudo reboot
 
-## Console
-The console is enabled by default and can be accessed by clicking center top of the main screen or by clicking the thumbnail area while printing.
 
-The console enables sending commands and will display all gcode responses and information from Klipper normally found in the console tab in Mainsail or Fluidd.
-
+## Example pictures
 <p float="left">
-    <img src="img/console.PNG" height="400">
-    <img src="img/console_key.PNG" height="400">
-    <img src="img/console_num.PNG" height="400">
+    <img src="img/printing_page.jpeg" width="600">
+    <img src="img/file_explorer.jpeg" width="600">
 </p>
 
-## Thumbnails
-KlipperLCD also supports thumbnails!
+## Development
+I developed everything on my local computer with a USB to UART converter and ran Klipper on the Raspberry PI.
+To do this, I had to forward the klipper socket to my local computer via SSH and configure the address of the Moonraker API:
 
-Follow this guide to enable thumbnails in your slicer: https://klipperscreen.readthedocs.io/en/latest/Thumbnails/
+> [!TIP]
+> Adjust the local path here `/tmp/local_klippy.sock` to your needs and the klipper path to wherever your klipper socket is created. (See **Klipper socket API** to find your socket path)
 
-<p float="left">
-    <img src="img/thumb1.png" height="400">
-    <img src="img/thumb2.png" height="400">
-</p>
+```Shell
+ssh -L /tmp/local_klippy.sock:/home/pi/printer_data/comms/klippy.sock pi@your.host.com
+```
+
+### J-Commands
+The protocol between the display and the Python program is partly controlled by commands, which I call `J-Commands`. These cause events on the display or are needed to confirm states. Here is a list of commands I was able to find:
+
+| Code  | Description                                                      |
+|-------|--------------------------------------------------------------------|
+| J00   | Set mode to "SD Card inserted"                                     |
+| J01   | Set mode to "SD Card Removed"                                      |
+| J02   | Set mode to "No SD Card" + Pop-UP when in Filebrowser              |
+| J03   | Set mode to "USB Online"                                           |
+| J04   | Set mode to "Printing from SD Card"                                |
+| J05   | Set mode to "Pause"                                                |
+| J06   | Set mode to "Nozzle Heating"                                       |
+| J07   | Set mode to "Nozzle Heating Done"                                  |
+| J08   | Set mode to "Nozzle Bed heating"                                   |
+| J09   | Set mode to "Nozzle Bed heating Done"                              |
+| J10   | Set mode to "T0 Senser abnormal" + Pop-Up "T0 Senser abnormal"     |
+| J11   | Kill ACK ??                                                        |
+| J12   | Set mode to "Ready"                                                |
+| J13   | Set mode to "Low E0 Temperature"                                   |
+| J14   | Blocking Pop-Up "Print done popup + time taken" + Set mode to "Printing Done" |
+| J15   | Temporary Pop-Up "Lack of filament or filament monitor abnormal"   |
+| J16   | Set mode to "Stop"                                                 |
+| J17   | Mainboard reset ??                                                 |
+| J18   | User Confirmations for SD-Card actions ?                           |
+| J19   | ??                                                                 |
+| J20   | File loaded successful ACK                                         |
+| J21   | File loaded unsuccessful ACK                                       |
+| J23   | Blocking Pop-Up "Lack of filament or filament monitor abnormal" + Set mode to "Lack of Filament" |
+| J24-32| ??                                                                 |
+| J33   | Build Version?                                                     |
+
+### A-Commands
+
+| Command | Description                                     | Parameters                                                   |
+|---------|-------------------------------------------------|--------------------------------------------------------------|
+| A0      | Get the current hot end temperature             | None                                                         |
+| A1      | Get the target hot end temperature              | None                                                         |
+| A2      | Get the current heat bed temperature            | None                                                         |
+| A3      | Get the target heat bed temperature             | None                                                         |
+| A4      | Get the part cooling fan speed                  | None                                                         |
+| A5      | Get the current position                        | None                                                         |
+| A6      | Get the print progress                          | None                                                         |
+| A7      | Get the printing time                           | None                                                         |
+| A8      | Get the list of G-code files                    | S<page_number>                                               |
+| A9      | Pause the current print                         | None                                                         |
+| A10     | Resume the paused print                         | None                                                         |
+| A11     | Stop the current print                          | None                                                         |
+| A12     | Kill the current print                          | None                                                         |
+| A13     | Select a file for printing                      | alt_name (e.g., `<0-f.idx>`)                                  |
+| A14     | Start printing the selected file                | None                                                         |
+| A15     | Resume printing from power outage               | None                                                         |
+| A16     | Set the target hot end temperature              | S<temp>                                                      |
+| A17     | Set the target heat bed temperature             | S<temp>                                                      |
+| A18     | Set the part cooling fan speed                  | S<speed>                                                     |
+| A19     | Stop the stepper motors                         | None                                                         |
+| A20     | Get or set the printing speed                   | S<speed> (optional for setting speed)                        |
+| A21     | Home all axes                                   | C (Home all) or X (Home X) or Y (Home Y) or Z (Home Z)       |
+| A22     | Move a specific axis                            | X<distance>F<speed> or Y<distance>F<speed> or Z<distance>F<speed> |
+| A23     | Preheat for PLA                                 | None                                                         |
+| A24     | Preheat for ABS                                 | None                                                         |
+| A25     | Cool down the printer                           | None                                                         |
+| A26     | Refresh the list of G-code files                | None                                                         |
+
+
+### Sequence diagrams
+Take a look at the `sequence_diagrams` folder.
+I have done my best to represent the communication between display and controller as a sequence diagram.
+
+All diagrams are generated with [sequencediagram.org](https://sequencediagram.org/)
+
+
+
+If you like, buy me a coffee
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](coff.ee/judokan9)
