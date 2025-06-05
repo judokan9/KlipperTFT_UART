@@ -3,7 +3,7 @@ Want to run Klipper on your Anycubic-i3-Mega? And still want to be able to use y
 
 Take a look at this python service.
 
-Forked from [joakimtoe/KlipperTFT](https://github.com/joakimtoe/KlipperTFT) and based on the work of Marlin [`anycubic_i3mega_TFT.cpp`](https://github.com/MarlinFirmware/Marlin/blob/eaab2dea925f0da5b38fcec1c58e9b8806efbaf8/Marlin/src/lcd/extui/anycubic_i3mega/anycubic_i3mega_lcd.cpp)
+Forked from [joakimtoe/KlipperLCD](https://github.com/joakimtoe/KlipperLCD) and based on the work of Marlin [`anycubic_i3mega_TFT.cpp`](https://github.com/MarlinFirmware/Marlin/blob/eaab2dea925f0da5b38fcec1c58e9b8806efbaf8/Marlin/src/lcd/extui/anycubic_i3mega/anycubic_i3mega_lcd.cpp)
 
 Thank you for your Work!!!
 
@@ -44,8 +44,8 @@ When wiring your screen, you can either wire it directly to one of your Raspberr
 
     | Raspberry Pi  | TFT               |
     | ------------- | ----------------- |
-    | Pin 4 (5V)    | 5V  (Black wire)  |
-    | Pin 6 (GND)   | GND (Red wire)    |
+    | Pin 4 (5V)    | 5V  (Red wire)  |
+    | Pin 6 (GND)   | GND (Black wire)    |
     | GPIO 14 (TXD) | RX  (Green wire)  |
     | GPIO 15 (RXD) | TX (Yellow wire)  |
 
@@ -58,14 +58,14 @@ When wiring your screen, you can either wire it directly to one of your Raspberr
 Quite simple, just remember to cross RX and TX on the TFT and the USB/UART HW.
 | USB <-> UART HW | TFT               |
 | --------------- | ----------------- |
-| 5V              | 5V  (Black wire)  |
-| GND             | GND (Red wire)    |
+| 5V              | 5V  (Red wire)  |
+| GND             | GND (Black wire)    |
 | TXD             | RX  (Green wire)  |
 | RXD             | TX (Yellow wire)  |
 
 <p float="left">
     <img src="img/USB_conn.png" height="400">
-    <img src="img/TFT_conn.png" height="400">
+    <img src="img/TFT_conn.jpeg" height="400">
 </p>
 
 ## Enable the UART
@@ -172,69 +172,15 @@ ssh -L /tmp/local_klippy.sock:/home/pi/printer_data/comms/klippy.sock pi@your.ho
 ### J-Commands
 The protocol between the display and the Python program is partly controlled by commands, which I call `J-Commands`. These cause events on the display or are needed to confirm states. Here is a list of commands I was able to find:
 
-| Code  | Description                                                      |
-|-------|--------------------------------------------------------------------|
-| J00   | Set mode to "SD Card inserted"                                     |
-| J01   | Set mode to "SD Card Removed"                                      |
-| J02   | Set mode to "No SD Card" + Pop-UP when in Filebrowser              |
-| J03   | Set mode to "USB Online"                                           |
-| J04   | Set mode to "Printing from SD Card"                                |
-| J05   | Set mode to "Pause"                                                |
-| J06   | Set mode to "Nozzle Heating"                                       |
-| J07   | Set mode to "Nozzle Heating Done"                                  |
-| J08   | Set mode to "Nozzle Bed heating"                                   |
-| J09   | Set mode to "Nozzle Bed heating Done"                              |
-| J10   | Set mode to "T0 Senser abnormal" + Pop-Up "T0 Senser abnormal"     |
-| J11   | Kill ACK ??                                                        |
-| J12   | Set mode to "Ready"                                                |
-| J13   | Set mode to "Low E0 Temperature"                                   |
-| J14   | Blocking Pop-Up "Print done popup + time taken" + Set mode to "Printing Done" |
-| J15   | Temporary Pop-Up "Lack of filament or filament monitor abnormal"   |
-| J16   | Set mode to "Stop"                                                 |
-| J17   | Mainboard reset ??                                                 |
-| J18   | User Confirmations for SD-Card actions ?                           |
-| J19   | ??                                                                 |
-| J20   | File loaded successful ACK                                         |
-| J21   | File loaded unsuccessful ACK                                       |
-| J23   | Blocking Pop-Up "Lack of filament or filament monitor abnormal" + Set mode to "Lack of Filament" |
-| J24-32| ??                                                                 |
-| J33   | Build Version?                                                     |
+[J Commands](https://github.com/judokan9/KlipperTFT_UART/wiki/J%E2%80%90Commands): Documentation of all observed `J-Commands`
 
 ### A-Commands
 
-| Command | Description                                     | Parameters                                                   |
-|---------|-------------------------------------------------|--------------------------------------------------------------|
-| A0      | Get the current hot end temperature             | None                                                         |
-| A1      | Get the target hot end temperature              | None                                                         |
-| A2      | Get the current heat bed temperature            | None                                                         |
-| A3      | Get the target heat bed temperature             | None                                                         |
-| A4      | Get the part cooling fan speed                  | None                                                         |
-| A5      | Get the current position                        | None                                                         |
-| A6      | Get the print progress                          | None                                                         |
-| A7      | Get the printing time                           | None                                                         |
-| A8      | Get the list of G-code files                    | S<page_number>                                               |
-| A9      | Pause the current print                         | None                                                         |
-| A10     | Resume the paused print                         | None                                                         |
-| A11     | Stop the current print                          | None                                                         |
-| A12     | Kill the current print                          | None                                                         |
-| A13     | Select a file for printing                      | alt_name (e.g., `<0-f.idx>`)                                  |
-| A14     | Start printing the selected file                | None                                                         |
-| A15     | Resume printing from power outage               | None                                                         |
-| A16     | Set the target hot end temperature              | S<temp>                                                      |
-| A17     | Set the target heat bed temperature             | S<temp>                                                      |
-| A18     | Set the part cooling fan speed                  | S<speed>                                                     |
-| A19     | Stop the stepper motors                         | None                                                         |
-| A20     | Get or set the printing speed                   | S<speed> (optional for setting speed)                        |
-| A21     | Home all axes                                   | C (Home all) or X (Home X) or Y (Home Y) or Z (Home Z)       |
-| A22     | Move a specific axis                            | X<distance>F<speed> or Y<distance>F<speed> or Z<distance>F<speed> |
-| A23     | Preheat for PLA                                 | None                                                         |
-| A24     | Preheat for ABS                                 | None                                                         |
-| A25     | Cool down the printer                           | None                                                         |
-| A26     | Refresh the list of G-code files                | None                                                         |
+[A Commands](https://github.com/judokan9/KlipperTFT_UART/wiki/A%E2%80%90Commands): Documentation of all observed `A-Commands`
 
 
 ### Sequence diagrams
-Take a look at the `sequence_diagrams` folder.
+Take a look at [Sequence Diagrams](https://github.com/judokan9/KlipperTFT_UART/wiki/Sequence-Diagrams) for Visual representation of the communication.
 I have done my best to represent the communication between display and controller as a sequence diagram.
 
 All diagrams are generated with [sequencediagram.org](https://sequencediagram.org/)
