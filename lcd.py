@@ -111,7 +111,8 @@ class LCD:
             'A23': self._PreHeatPLA,
             'A24': self._PreHeatABS,
             'A25': self._CoolDown,
-            'A26': self._RefreshFileList
+            'A26': self._RefreshFileList,
+            'A33': self._GetVersionInfo
         }
 
         self.evt = LCDEvents()
@@ -622,6 +623,11 @@ class LCD:
             self._CreateFileDict(self.files)
 
         self.send_line("J21")  # Unset file load successful
+
+    # A33
+    def _GetVersionInfo(self):
+        self.send_line("J33") # Build Version J33
+        self.send_line(self.printer.SHORT_BUILD_VERSION)
 
 
 if __name__ == "__main__":
