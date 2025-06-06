@@ -327,8 +327,8 @@ class LCD:
         message_lines = ['FN']
 
         if self.current_dir == '<0-d.idx>' and page_param == 0:
-            message_lines.append('<menu>')
-            message_lines.append('<Special Menu>')
+            message_lines.append('<SPECI~1.GCO')
+            message_lines.append('<Special Menu>.gcode')
 
         current_items = list(current_dict.items())
         print("")
@@ -342,8 +342,11 @@ class LCD:
 
         for k, v in current_items:
             if v['type'] == 'dir':
-                message_lines.append(v['alt_name'])
-                message_lines.append(f"{k}/")
+                message_lines.append("/")
+                #message_lines.append(v['alt_name'])
+                message_lines.append(f"{k}")
+                message_lines.append("/")
+                message_lines.append(f"{k}")
             else:
                 message_lines.append(v['alt_name'])
                 message_lines.append(k)
