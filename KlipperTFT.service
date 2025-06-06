@@ -1,0 +1,16 @@
+[Unit]
+ Description=KlipperLCD Service
+ After=moonraker.service
+
+[Service]
+ Type=simple
+ # Set the User parameter to 1000 this will resolve to the default system user for the most time
+ # `Pi` for raspbian or `biqu` for CB1/2 armbian
+ # Adjust it, if you use a different user on your system, to run this service of
+ User=1000
+ Restart=always
+ RestartSec=1
+ ExecStart=/bin/sh -c '/usr/bin/env python3 ~/KlipperTFT_UART/main.py  > /tmp/KlipperTFT.log 2>&1'
+
+[Install]
+ WantedBy=multi-user.target

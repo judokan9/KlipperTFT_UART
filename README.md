@@ -27,6 +27,7 @@ Running together with Klipper3d and Moonraker!
 * [ ] Use ENV vars to configure UART-Port and moonraker address and configure the service via systemd-service / `/etc/defaults`
 * [ ] Maybe a context manager for the uart port
 * [ ] Use the special menu for Stuff like bed leveling
+* [ ] Use systemd as logger for the service
 
 ## Whats needed?
 * A Anycubic-i3-Mega TFT Screen (any from [THIS](https://github.com/knutwurst/Marlin-2-0-x-Anycubic-i3-MEGA-S/wiki/Types-of-Anycubic-Touchscreens) list should work).
@@ -70,7 +71,9 @@ Quite simple, just remember to cross RX and TX on the TFT and the USB/UART HW.
 
 ## Enable the UART
 > **_Note_**: You can safely skip this section if you wired the display through a USB to UART converter
+
 ### [Disable Linux serial console](https://www.raspberrypi.org/documentation/configuration/uart.md)
+#### Raspberry environments
   By default, the primary UART is assigned to the Linux console. If you wish to use the primary UART for other purposes, you must reconfigure Raspberry Pi OS. This can be done by using raspi-config:
 
   * Start raspi-config: `sudo raspi-config.`
@@ -85,6 +88,16 @@ Quite simple, just remember to cross RX and TX on the TFT and the USB/UART HW.
   In brief, add a line to the `/boot/config.txt` file to apply a Device Tree overlay.
 
     dtoverlay=disable-bt
+
+#### BigTreetech `armbian`
+  * Either login via SSH and head to the `/boot` directory and edit the `armbianEnv.txt` or plug the SD-Card into your PC (if you have the non eMMC variant) and edit the `armbianEnv.txt` from there.
+  * Adjust the `console` parameter to `console=serial`
+
+The default value is `console=display`, This means that the UART0 of CB1/CB2 is used as the debugging port by default.
+
+  * Reboot
+
+  Now you can use `/dev/ttyS0` in KlipperTFT
 
 ## Run the KlipperTFT service
 * SSH into your Raspberry Pi
@@ -103,10 +116,10 @@ Quite simple, just remember to cross RX and TX on the TFT and the USB/UART HW.
     The KLIPPER_ARGS should include `-a /home/pi/printer_data/comms/klippy.sock`. If not add it to the klipper.env file!
 
 ### Install dependencies
-    sudo apt-get install python3-pip git
-    pip install pyserial
+    sudo apt install python3-requests python3-serial git
 
 ### Get the code
+    cd ~
     git clone https://github.com/judokan9/KlipperTFT_UART.git
     cd KlipperTFT_UART
 
@@ -119,7 +132,7 @@ class KlipperTFT ():
         TFT("/dev/ttyAMA0", callback=self.lcd_callback)
         ...
 ```
-* If your UART is something other than the default `ttyAMA0`, replace the string `"/dev/ttyAMA0"` to match your UART selection.
+* If your UART is something other than the default `ttyAMA0`, replace the string `"/dev/ttyAMA0"` to match your UART selection (i.e. `/dev/ttyS0` for CB1/CB2).
 
 
     > **_Note_**: If using a USB to UART converter to connect your screen to Klipper, the converter usually shows up in Linux as `"/dev/ttyUSB0"`.
@@ -139,15 +152,11 @@ Enable the service to automatically start at boot:
 
     sudo chmod +x main.py
 
-    sudo chmod +x KlipperTFT.service
-
-    sudo mv KlipperTFT.service /etc/systemd/system/KlipperTFT.service
-
-    sudo chmod 644 /etc/systemd/system/KlipperTFT.service
+    sudo ln -s ~/KlipperTFT_UART/KlipperTFT.service /etc/systemd/system/KlipperTFT.service
 
     sudo systemctl daemon-reload
 
-    sudo systemctl enable KlipperTFT.service
+    sudo systemctl enable --now KlipperTFT.service
 
     sudo reboot
 
