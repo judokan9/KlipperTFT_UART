@@ -229,12 +229,12 @@ class LCD:
             # search for altnames
             altname_param = re.search(r'<[^>]+>', decoded_data)
 
+            # search for A22 movement
+            moveAxismatch = re.match(r'A22\s+([XYZ])\s*([+-]?\d+(?:\.\d+)?)\s*F(\d+)', decoded_data)
+
             # search for plain param
             plain_param_match = re.search(r'([a-zA-Z0-9_./-]+)', decoded_data.split(addr)[-1].strip())
             plain_param = plain_param_match.group(1) if plain_param_match else None
-
-            # search for A22 movement
-            moveAxismatch = re.match(r'A22\s+([XYZ])\s+([+-]?[0-9]*\.?[0-9]+)F([0-9]+)', decoded_data)
 
 
             if len(params) == 0:
