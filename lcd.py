@@ -159,6 +159,8 @@ class LCD:
         self.askprint = False
         # Make sure the serial port closes when you quit the program.
         atexit.register(self._atexit)
+        # Special messages for DGUS clones
+        self.DGUS = True
 
     def _atexit(self):
         self.ser.close()
@@ -263,19 +265,37 @@ class LCD:
     # Required functions for file menu
     ########
 
+    # Truncation for DGUS clones
+    def _DgusTruncate(self, name, is_file=False):
+        max_len = 20
+        print(f"DGUS: {self.DGUS}")
+        if self.DGUS:
+            if is_file:
+                # Split filename and extension
+                if '.' in name:
+                    base, _ = name.rsplit('.', 1)
+                else:
+                    base = name
+                base = base[:max_len]  # Truncate base
+                return base + '.gcode'
+            else:
+                return name[:max_len - 1 ] + '/' + '.gcode'
+        return name
+
     def _CreateFileDict(self, files):
         # alt_name max length can be 29 chars before overflow
         # display cuts display names after 22 chars
+
         def add_to_dict(path_parts, index, original_name, current_dict, folder_index):
             if len(path_parts) == 1:
-                filename = path_parts[0]
+                filename = self._DgusTruncate(path_parts[0], is_file=True)
                 current_dict[filename] = {
                     'alt_name': f"<{index}-f.idx>",
                     'type': 'file',
                     'original_name': original_name
                 }
             else:
-                folder = path_parts[0]
+                folder = self._DgusTruncate(path_parts[0])
                 if folder not in current_dict:
                     folder_alt_name = f"<{folder_index}-d.idx>"
                     current_dict[folder] = {
@@ -328,8 +348,8 @@ class LCD:
         message_lines = ['FN']
 
         if self.current_dir == '<0-d.idx>' and page_param == 0:
-            message_lines.append('<SPECI~1.GCO')
-            message_lines.append('<Special Menu>.gcode')
+            message_lines.append('<menu>')
+            message_lines.append(self._DgusTruncate('<Special Menu>'))
 
         current_items = list(current_dict.items())
         print("")
@@ -343,10 +363,7 @@ class LCD:
 
         for k, v in current_items:
             if v['type'] == 'dir':
-                message_lines.append("/")
-                #message_lines.append(v['alt_name'])
-                message_lines.append(f"{k}")
-                message_lines.append("/")
+                message_lines.append(v['alt_name'])
                 message_lines.append(f"{k}")
             else:
                 message_lines.append(v['alt_name'])
@@ -354,7 +371,7 @@ class LCD:
 
         if self.current_dir != '<0-d.idx>' and len(current_items[start_index:end_index]) < 4:
             message_lines.append('<back-d.idx>')
-            message_lines.append('/..')
+            message_lines.append(self._DgusTruncate('/..'))
 
         message_lines.append('END')
         full_message = "\r\n".join(message_lines)
