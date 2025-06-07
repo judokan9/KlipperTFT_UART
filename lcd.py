@@ -290,14 +290,14 @@ class LCD:
             if len(path_parts) == 1:
                 filename = self._DgusTruncate(path_parts[0], is_file=True)
                 current_dict[filename] = {
-                    'alt_name': f"<{index}-f.idx>",
+                    'alt_name': f"<{index}-f.idx>.GCO",
                     'type': 'file',
                     'original_name': original_name
                 }
             else:
                 folder = self._DgusTruncate(path_parts[0])
                 if folder not in current_dict:
-                    folder_alt_name = f"<{folder_index}-d.idx>"
+                    folder_alt_name = f"<{folder_index}-d.idx>.GCO"
                     current_dict[folder] = {
                         'alt_name': folder_alt_name,
                         'type': 'dir',
@@ -348,7 +348,7 @@ class LCD:
         message_lines = ['FN']
 
         if self.current_dir == '<0-d.idx>' and page_param == 0:
-            message_lines.append('<menu>')
+            message_lines.append('<menu>.GCO')
             message_lines.append(self._DgusTruncate('<Special Menu>'))
 
         current_items = list(current_dict.items())
@@ -370,7 +370,7 @@ class LCD:
                 message_lines.append(k)
 
         if self.current_dir != '<0-d.idx>' and len(current_items[start_index:end_index]) < 4:
-            message_lines.append('<back-d.idx>')
+            message_lines.append('<back-d.idx>.GCO')
             message_lines.append(self._DgusTruncate('/..'))
 
         message_lines.append('END')
